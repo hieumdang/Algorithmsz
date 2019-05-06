@@ -1,0 +1,190 @@
+#include <iostream>
+#include <math.h>
+#include <algorithm>
+using namespace std;
+
+double xcenter[3];     //center co-ord
+double ycenter[3];
+int grouping[10];
+int previous_grouping[10];
+
+double x[10];    // points co-ordinators
+double y[10];
+
+double d1[10];   //distance to center1, center2
+double d2[10];
+
+
+double accX1;    //accumulator
+double accY1;
+double accX2;    //accumulator
+double accY2;
+
+bool isIdentical(int[], int[], int);
+
+int main()
+{
+	cout << "Enter the number of Clusters (K): " << endl;
+	int k;
+	cin >> k;
+
+
+	//Assume the center
+	for (int i = 0; i < k; i++)
+	{
+		cout << "Type in Cluster " << i + 1 << " center locations: " << endl;
+		cin >> xcenter[i] >> ycenter[i];
+	}
+
+	cout << "Enter the number of points you want to add: ";
+	int numOfPoints;
+	cin >> numOfPoints;
+
+	for (int i = 0; i < numOfPoints; i++)
+	{
+		cout << "Point " << i + 1 << " location (X, type enter, then Y): " << endl;
+		cin >> x[i] >> y[i];
+		previous_grouping[i] = 0;          //initialize previous_grouping;
+	}
+
+	for (int i = 0; i < 3; i++)
+	{
+		d1[i] = 0;
+		d2[2] = 0;
+		grouping[i] = 0;
+		accX1 = 0;
+		accY1 = 0;
+		accX2 = 0;
+		accY2 = 0;
+	}
+	//calculate distance to centers 
+	for (int i = 0; i < numOfPoints; i++)
+	{
+		d1[i] = sqrt((xcenter[0] - x[i])*(xcenter[0] - x[i]) + (ycenter[0] - y[i])*(ycenter[0] - y[i]));
+		d2[i] = sqrt((xcenter[1] - x[i])*(xcenter[1] - x[i]) + (ycenter[1] - y[i])*(ycenter[1] - y[i]));
+	}
+	//have 2 array of distances, now compare to find where it is belong to cluster 1,2,... or k
+
+	for (int i = 0; i < numOfPoints; i++)
+	{
+		double min_dist;
+		min_dist = std::min(d1[i], d2[i]);
+		if (min_dist == d1[i])
+			grouping[i] = 1;
+		else
+			grouping[i] = 2;
+	}
+	// now grouping[i] = [1,2,1,1,...2] blah blah blah
+	int count1 = 0;
+	int count2 = 0;
+
+	for (int i = 0; i < numOfPoints; i++)
+	{
+		if (grouping[i] == 1)
+		{
+			accX1 += x[i];
+			accY1 += y[i];
+			count1++;
+		}
+		else
+		{
+			accX2 += x[i];
+			accY2 += y[i];
+			count2++;
+		}
+	}
+
+	//take average
+	xcenter[0] = accX1 / count1;
+	ycenter[0] = accY1 / count1;
+	xcenter[1] = accX2 / count2;
+	ycenter[1] = accY2 / count2;
+
+	cout << "Cluster 1 [" << xcenter[0] << ", " << ycenter[0] << "]" << endl;
+	cout << "Cluster 2 [" << xcenter[1] << ", " << ycenter[1] << "]" << endl;
+
+	bool done = isIdentical(grouping, previous_grouping, numOfPoints);
+
+
+	//have done the 1st iteration here 
+	for (int i = 0; i < numOfPoints; i++)
+	{
+		count1 = 0, count2 = 0;      //reset count
+		accX1 = 0; accX2 = 0; accY1 = 0; accY2 = 0;  //reset accumulator
+													 // recalculate distance to centers 
+		for (int i = 0; i < numOfPoints; i++)
+		{
+
+			d1[i] = sqrt((xcenter[0] - x[i])*(xcenter[0] - x[i]) + (ycenter[0] - y[i])*(ycenter[0] - y[i]));
+			d2[i] = sqrt((xcenter[1] - x[i])*(xcenter[1] - x[i]) + (ycenter[1] - y[i])*(ycenter[1] - y[i]));
+		}
+
+		//restart dividing to new groups
+		for (int i = 0; i < numOfPoints; i++)
+		{
+			previous_grouping[i] = grouping[i];      //update the new grouping
+			grouping[i] = 0;
+			double min_dist;
+			min_dist = std::min(d1[i], d2[i]);
+			if (min_dist == d1[i])
+				grouping[i] = 1;
+			else
+				grouping[i] = 2;
+		}
+
+		for (int i = 0; i < numOfPoints; i++)
+		{
+			if (grouping[i] == 1)
+			{
+				accX1 += x[i];
+				accY1 += y[i];
+				count1++;
+			}
+			else
+			{
+				accX2 += x[i];
+				accY2 += y[i];
+				count2++;
+			}
+
+		}
+		//take average--> new center
+		xcenter[0] = accX1 / count1;
+		ycenter[0] = accY1 / count1;
+		xcenter[1] = accX2 / count2;
+		ycenter[1] = accY2 / count2;
+
+		//update new average
+
+		cout << "Cluster 1 [" << xcenter[0] << ", " << ycenter[0] << "]" << endl;
+		cout << "Cluster 2 [" << xcenter[1] << ", " << ycenter[1] << "]" << endl;
+
+		//restriction to stop the while loop
+		if (done)
+			break;
+
+	}
+	cout << "Final Cluster 1 [" << xcenter[0] << ", " << ycenter[0] << "]" << endl;
+	cout << "Final Cluster 2 [" << xcenter[1] << ", " << ycenter[1] << "]" << endl;
+
+	cout << "Type any character to end." << endl;
+	int finished;
+	cin >> finished;
+};
+
+
+
+bool isIdentical(int c[], int previous_c[], int numOfPoints)
+{
+	bool r = true;
+	//restriction to stop the while loop
+	for (int i = 0; i < numOfPoints; i++)
+	{
+		if (c[i] != previous_c[i])
+		{
+			r = false;
+		}
+	}
+	return r;
+
+}
