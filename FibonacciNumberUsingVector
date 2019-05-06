@@ -1,0 +1,68 @@
+#include "stdafx.h"
+#include <vector>
+#include <iostream>
+using namespace std;
+
+const int max_size = 418;              //2000th number of the series is a number of 418 digits
+int accumulator=0;
+int carry = 0;
+
+int main()
+{
+    int n;
+    cout << "Enter a n" << endl;
+    cin >> n;
+
+    vector <int> f(max_size), s(max_size), ans(0);
+    for (int i = 0; i < max_size; i++)
+    {
+   	 f.at(i) = 0;
+   	 s.at(i) = 0;
+    }
+    f.at(max_size - 1) = 1;
+    s.at(max_size - 1) = 1;
+    
+    int m = 4;                 	// Series :0,1,1,2,4 → 2 is the 4th in the series
+    for (int j = 3; j < n; j++)
+    {
+   	 int k = 1;   // k increases as we access the vector in backward direction  
+   	 for (int i = 0; i < max_size; i++)
+   	 {
+   		 accumulator = f.at(max_size - k ) + s.at(max_size - k) + carry;
+   		 carry = accumulator / 10;
+   		 ans.push_back(accumulator % 10);
+   		 k++;
+   	 }
+   	 reverse(ans.begin(), ans.end());
+
+
+   	 //update 2nd  = new 1st 
+   	 for (int i = 0; i < max_size; i++)
+   	 {
+   		 f.at(i) = s.at(i);
+   	 }
+             
+             // update ans =  new 2nd 
+   	 for (int i = 0; i < max_size; i++)
+   	 {
+   		 s.at(i) = ans.at(i);
+   	 }
+
+   	 //print out
+
+   	 cout << "Fibonacci number " <<  m << " = " << endl;
+   	 for (int i = 0; i < max_size; i++)
+   	 {
+   		 cout << ans.at(i) ;
+   	 }
+   	 cout << endl;
+   	 cout << "-----------------------------" << endl;
+   	 cout << endl;
+   	 
+   	 if (m < n)
+   		 m++;
+    }
+	return 0;
+}
+
+
