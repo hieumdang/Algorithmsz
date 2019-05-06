@@ -1,0 +1,114 @@
+// Tscan.cpp : Defines the entry point for the console application.
+
+#include "stdafx.h"
+#include <iostream>
+using namespace std;
+typedef char T;
+struct tnode{
+	T data;
+	tnode *lchild, *rchild;
+};
+class tree{
+public:
+	tree();
+	void lnrscan();
+	void nlrscan();
+	void lrnscan();
+private:
+	tnode *root;
+	tnode *build();
+	void lnrscan(tnode *r);
+	void nlrscan(tnode *r);
+	void lrnscan(tnode *r);
+};
+tree::tree(){
+	cout<<"Input the tree in NLR format:";
+	root=build();
+}
+tnode* tree::build(){
+	char c;
+	cin>>c;
+	if (c=='.')
+		return NULL;
+	tnode *t;
+		t=new(tnode);
+		t->data=c;
+		t->lchild=build();
+		t->rchild=build();
+		return t;
+}
+void tree::lnrscan(){
+	cout<<"LNR scan of this tree is as follows:";
+	lnrscan(root);
+	cout<<endl;
+}
+void tree::lrnscan(){
+	cout<<"LRN scan of this tree is as follows:";
+	lrnscan(root);
+	cout<<endl;
+}
+void tree::nlrscan(){
+	cout<<"NLR scan of this tree is as follows:";
+	nlrscan(root);
+	cout<<endl;
+}
+void tree::lnrscan(tnode *r){
+	if (r){
+		lnrscan(r->lchild);
+		cout<<r->data<<" ";
+		lnrscan(r->rchild);
+	}
+}
+void tree::lrnscan(tnode *r){
+	if (r){
+		lrnscan(r->lchild);
+		lrnscan(r->rchild);
+		cout<<r->data<<" ";
+	}
+}
+void tree::nlrscan(tnode *r){
+	if (r){
+		cout<<r->data<<" ";
+		nlrscan(r->lchild);
+		nlrscan(r->rchild);
+	}
+}
+int _tmain(int argc, _TCHAR* argv[])
+{
+	tree ex1;
+	ex1.nlrscan();
+	ex1.lnrscan();
+	ex1.lrnscan();
+	return 0;
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
