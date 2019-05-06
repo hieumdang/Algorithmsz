@@ -1,0 +1,73 @@
+#include "stdafx.h"
+#include<vector>
+#include<iostream>
+//100! =  a number of 158 ints
+// 300! = a number of 615 ints
+const int max_size = 615;       // 300! is a number of 615 digits
+
+using namespace std;
+vector <int> first(max_size), second(max_size), ans(10);       // 10 is arbitrarily chosen.
+
+int main()
+{
+ 
+
+    for (int i = 0; i < max_size; i++)
+    {
+   	 first.at(i) = 0;
+    }
+    first.at(max_size - 1) = 2;                     // factorial really have meaning from 2! to n!
+                                                                // thus, started with 2.
+    for (int i = 0; i < max_size; i++)
+    {
+   	 second.at(i) = 0;
+    }
+    second.at(max_size - 1) = 6;                      // 3! = 6
+
+    //first = 2; second =3! =6
+
+
+    int carry = 0;
+    int accumulator = 0;
+    int n;
+    cout << "Enter a n: " << endl;
+    cin >> n;
+    
+    int m = 4;       	        //m increase as m = 4, 5, 6, 7, 8 ....
+    for (int j = 3; j < n; j++)
+    {
+   	 int k = 1;                      // k increases as we access the vector in backward direction   
+
+   	 for (int i = 0; i < max_size; i++)
+   	 {
+   		 accumulator = (m)* second.at(max_size- k) + carry;
+   		 carry = accumulator / 10;
+   		 ans.push_back(accumulator % 10);
+   		 k++;
+   	 }
+   	 
+   	 
+   	 reverse(ans.begin(), ans.end());
+   	 
+
+   	 //update 2nd  = new ans
+
+   	 for (int i = 0; i < max_size; i++)
+   	 {
+   		 second.at(i) = ans.at(i);
+   	 }
+   	 if (m < n)
+   	 m++;
+    }
+
+    cout << m << "! = ";
+    //print out
+    
+    for (int i =0; i < size; i++)
+    {
+   		 cout << ans.at(i);
+    }
+    
+    cout << endl;
+    return 0;
+}
