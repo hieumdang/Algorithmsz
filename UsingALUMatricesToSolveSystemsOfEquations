@@ -1,0 +1,179 @@
+
+#include "stdafx.h"
+#include <iostream>
+#include <iomanip>
+using namespace std;
+
+
+int main()
+{
+    int n;
+    //part A;
+    cout << "++++ PART A +++" << endl;
+    cout << "Enter N for the NxN matrix A." << endl;
+    cin >> n;
+
+    double **A = new double*[n];
+    for (int i = 0; i < n; i++) {
+   	 A[i] = new double[n];
+    }
+
+    double **L = new double*[n];
+    for (int i = 0; i < n; i++) {
+   	 L[i] = new double[n];
+    }
+
+    for (int i = 0; i < n; i++) {
+   	 for (int j = 0; j < n; j++) {
+   		 L[i][j] = 0;
+   	 }
+    }
+
+    double **U = new double*[n];
+    for (int i = 0; i < n; i++) {
+   	 U[i] = new double[n];
+    }
+
+    for (int i = 0; i < n; i++) {
+   	 for (int j = 0; j < n; j++) {
+   		 U[i][j] = 0;
+   	 }
+    }
+
+    for (int i = 0; i < n; i++) {
+   	 for (int j = 0; j < n; j++) {
+   		 cout << "Enter value for A [" << i + 1 << ", " << j + 1 << "]" << endl;
+   		 cin >> A[i][j];
+   	 }
+    }
+
+    for (int i = 0; i < n; i++) {
+
+   	 // U matrix
+   	 for (int k = i; k < n; k++) {
+
+   		 // Adding L(i, j) * U(j, k)
+   		 double temp = 0;
+   		 for (int j = 0; j < i; j++)
+   			 temp += (L[i][j] * U[j][k]);
+
+   		 // U(i, k)
+   		 U[i][k] = A[i][k] - temp;
+   	 }
+
+   	 // L matrix
+   	 for (int k = i; k < n; k++) {
+   		 if (i == k)
+   			 L[i][i] = 1; // Diagonal = 1
+   		 else {
+
+   			 // Adding L(k, j) * U(j, i)
+   			 double temp = 0;
+   			 for (int j = 0; j < i; j++)
+   				 temp += (L[k][j] * U[j][i]);
+
+   			 // L(k, i)
+   			 L[k][i] = (A[k][i] - temp) / U[i][i];
+   		 }
+   	 }
+    }
+
+    cout << endl << "Matrix A = " << endl;
+    for (int i = 0; i < n; i++) {
+   	 for (int j = 0; j < n; j++) {
+   		 cout << setw(8) << A[i][j];
+   	 }
+
+   	 cout << endl;
+    }
+
+    cout << endl << "Matrix L = " << endl;
+    for (int i = 0; i < n; i++) {
+   	 for (int j = 0; j < n; j++) {
+   		 cout << setw(12) << L[i][j];
+   	 }
+
+   	 cout << endl;
+    }
+
+    cout << endl << "Matrix U = " << endl;
+    for (int i = 0; i < n; i++) {
+   	 for (int j = 0; j < n; j++) {
+   		 cout << setw(12) << U[i][j];
+   	 }
+
+   	 cout << endl;
+    }
+
+    //part B
+    cout << "++++ PART B +++" << endl;
+    double det = 1;
+
+    for (int i = 0; i < n; i++) {
+   	 for (int j = 0; j < n; j++) {
+   		 if (i == j) {
+   			 det = det * U[i][j];
+   		 }
+   	 }
+    }
+
+    cout << endl << "Determinant = " << det << endl;
+
+    //part C
+    cout << "++++ PART C +++" << endl;
+    cout << endl << endl << "Enter B matrix for Ax = B system of equations calculations." << endl;
+    double *B = new double[n];
+    for (int i = 0; i < n; i++) {
+   	 cout << "Enter B[" << i + 1 << "]" << endl;
+   	 cin >> B[i];
+    }
+
+    double *Z = new double[n];   			 //LZ = B
+    Z[0] = B[0];
+    for (int i = 1; i < n; i++) {
+   	 double sub = 0;
+   	 for (int j = (i - 1); j > 0; j--) {
+   		 sub = sub + (L[i][j] * Z[j]);
+   	 }
+
+   	 sub = sub + (L[i][0] * Z[0]);
+   	 Z[i] = B[i] - sub;
+    }
+
+    /*Z[1] = B[1] - (L[1][0] * Z[0]);
+    Z[2] = B[2] - ((L[2][0] * Z[0]) + (L[2][1] * Z[1]));
+    Z[3] = B[3] -((L[3][0] * Z[0]) + (L[3][1] * Z[1]) + L[3][2] * Z[2]) */
+
+    double *X = new double[n];   			 //UX = Z
+    for (int i = 0; i < n; i++) {
+   	 X[i] = 0;
+    }
+
+    for (int i = (n - 1); i >= 0; i--) {
+   	 double num = Z[i];
+   	 if (i < (n - 1)) {
+   		 for (int j = (n - 1); j >= 1; j--) {
+   			 num = num - (X[j] * U[i][j]);
+   		 }
+   	 }
+
+   	 X[i] = num / U[i][i];
+    }
+
+
+    /*
+    X[2] = Z[2] / U[2][2];
+    X[1] = (Z[1] - (X[2] * U[1][2])) / U[1][1];
+    X[0] = (Z[0] - (X[2] * U[0][2]) - (X[1] * U[0][1])) / U[0][0];*/
+
+    cout << endl << "Matrix Z = " << endl;
+    for (int i = 0; i < n; i++) {
+   	 cout << setw(12) << Z[i] << endl;
+    }
+
+    cout << endl << "Matrix X = " << endl;
+    for (int i = 0; i < n; i++) {
+   	 cout << setw(12) << X[i] << endl;
+    }
+    cin;
+}
